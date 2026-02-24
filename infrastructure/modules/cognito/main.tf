@@ -23,6 +23,9 @@ password_policy {
   require_symbols = true
 
 }
+lambda_config {
+  pre_sign_up = var.pre_signup_lambda_arn
+}
 
 tags = {
   Project:"serverless-taks-management"

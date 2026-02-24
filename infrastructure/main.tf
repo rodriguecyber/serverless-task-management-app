@@ -13,6 +13,7 @@ provider "aws" {
 }
  module "dynamodb" {
    source = "./modules/dynamodb"
+
  }
  module "sns" {
    source = "./modules/sns"
@@ -23,6 +24,19 @@ provider "aws" {
    dynamotable_arn = module.dynamodb.dynamo_table_arn
  }
 
-module "cogmito" {
+module "cognito" {
   source = "./modules/cognito"
+  pre_signup_lambda_arn = module.lambda.pre_signup_lambda_arn
+}
+
+module "lambda" {
+  source = "./modules/lambda"
+  cognito_user_pool_arn = module.cognito.user_pool_arn
+ lambda_role_arn= module.iam.lambda_role_arn
+}
+
+module "api_gateway" {
+  source = "./modules/api-gateway"
+  user_pool_id = module.cognito.user_pool_id
+  app_client_id = module.cognito.app_client_id
 }
