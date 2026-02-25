@@ -33,6 +33,10 @@ module "lambda" {
   source = "./modules/lambda"
   cognito_user_pool_arn = module.cognito.user_pool_arn
  lambda_role_arn= module.iam.lambda_role_arn
+  task_table_name = module.dynamodb.dynamo_table_name
+  api_gateway_id = module.api_gateway.api_id
+  authorizer_id = module.api_gateway.authorizer_id
+  api_gateway_execution_arn = module.api_gateway.api_gateway_execution_arn
 }
 
 module "api_gateway" {

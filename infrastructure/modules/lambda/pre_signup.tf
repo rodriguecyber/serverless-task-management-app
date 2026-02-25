@@ -1,9 +1,9 @@
 resource "aws_lambda_function" "pre_signup" {
   function_name = "task-management-pre-signup"
   role = var.lambda_role_arn
-  handler = "index.handler"
+  handler = "pre-signup.handler"
   runtime = "nodejs20.x"
-  filename = "${path.module}/../../../backend/pre-signup/function.zip"
+  filename = "${path.module}/../../../backend/dist/pre-signup.zip"
   timeout = 5
 }
 

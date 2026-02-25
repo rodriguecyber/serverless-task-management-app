@@ -6,3 +6,18 @@ variable "lambda_role_arn" {
 variable "cognito_user_pool_arn" {
   
 }
+
+variable "task_table_name" {
+  
+}
+variable "api_gateway_id" {
+  
+}
+
+variable "authorizer_id" {
+  
+}
+
+variable "api_gateway_execution_arn" {
+  
+}
