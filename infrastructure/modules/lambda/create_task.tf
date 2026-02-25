@@ -3,13 +3,14 @@ resource "aws_lambda_function" "create_task" {
   handler = "create_task.handler"
   runtime = "nodejs20.x"
   role = var.lambda_role_arn
-  filename = "${path.module}/../../../backend/dist/create_task.zip"
+  filename = "${path.root}/../backend/dist/create_task.zip"
+ source_code_hash = filebase64sha256("${path.root}/../backend/dist/create_task.zip")
   memory_size = 128
   timeout = 10
 
   environment {
     variables = {
-      TASK_TABLE=var.task_table_name
+      TASKS_TABLE=var.task_table_name
 
     }
   }
@@ -28,7 +29,7 @@ resource "aws_apigatewayv2_route" "create_task_route" {
   route_key = "POST /tasks"
   target = "integrations/${aws_apigatewayv2_integration.create_task_integration.id}" 
   authorizer_id = var.authorizer_id
-
+  authorization_type = "JWT"
 
 }
 

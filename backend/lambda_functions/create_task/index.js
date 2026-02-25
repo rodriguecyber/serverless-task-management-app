@@ -7,17 +7,20 @@ const ddb = new DynamoDBClient({ region: process.env.AWS_REGION });
 const TABLE_NAME = process.env.TASKS_TABLE;
 
 exports.handler = async (event) => {
-   if (!event.requestContext.authorizer?.claims) {
-    console.warn("Unauthorized access attempt");
-    console.log(event.requestContext.authorizer)
+  if (!event.requestContext?.authorizer?.jwt?.claims) {
+    console.warn("Unauthorized: missing or invalid authorizer context", {
+      hasRequestContext: !!event.requestContext,
+      hasAuthorizer: !!event.requestContext?.authorizer,
+      authorizerKeys: event.requestContext?.authorizer ? Object.keys(event.requestContext.authorizer) : [],
+    });
     return {
       statusCode: 401,
       body: JSON.stringify({ message: "Unauthorized" })
     };
   }
-  const user = event.requestContext.authorizer.claims;
+  const user = event.requestContext.authorizer.jwt.claims;
 
-  if (!user["cognito:groups"]?.includes("Admins")) {
+  if (!user["cognito:groups"]?.includes("task_admin_group")) {
     return { statusCode: 403, body: JSON.stringify({ message: "Forbidden" }) };
   }
 
@@ -38,7 +41,7 @@ exports.handler = async (event) => {
       description: { S: description },
       status: { S: "PENDING" },
       createdBy: { S: user.sub },
-      assignedTo: { SS: [] },
+      assignedTo: { L: [] },
       createdAt: { S: timestamp },
       updatedAt: { S: timestamp },
     },
@@ -50,6 +53,6 @@ exports.handler = async (event) => {
     return { statusCode: 201, body: JSON.stringify({ taskId, title, description }) };
   } catch (err) {
     console.error(err);
-    return { statusCode: 500, body: "Failed to create task" };
+    return { statusCode: 500, body: `Failed to create task: ${err.message}` };
   }
 };
