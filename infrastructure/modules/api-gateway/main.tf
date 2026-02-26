@@ -5,6 +5,12 @@ resource "aws_apigatewayv2_api" "http_api" {
 }
 data "aws_region" "current" {}
 
+resource "aws_apigatewayv2_stage" "default" {
+  api_id      = aws_apigatewayv2_api.http_api.id
+  name        = "$default"
+  auto_deploy = true
+}
+
 resource "aws_apigatewayv2_authorizer" "task_management_authorizer" {
   name = "task-management-authorizer"
   api_id = aws_apigatewayv2_api.http_api.id
