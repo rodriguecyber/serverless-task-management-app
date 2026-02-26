@@ -51,7 +51,7 @@ module "amplify"{
   source = "./modules/amplify"
   github_token = var.github_token
   repository_url = var.repository_url
-  api_base_url = module.api_gateway.api_base_url
+  api_base_url = module.api_gateway.api_endpoint
   user_pool_id = module.cognito.user_pool_id
   app_client_id = module.cognito.app_client_id
 }
