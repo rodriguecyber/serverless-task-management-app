@@ -11,6 +11,9 @@ exports.handler = async (event) => {
     if (!claims) {
       return { statusCode: 401, body: JSON.stringify({ message: "Unauthorized" }) };
     }
+    if (!claims["cognito:groups"]?.includes("task_admin_group")) {
+      return { statusCode: 403, body: JSON.stringify({ message: "Forbidden" }) };
+    }
 
     const result = await ddb.send(new ScanCommand({
       TableName: TABLE_NAME,

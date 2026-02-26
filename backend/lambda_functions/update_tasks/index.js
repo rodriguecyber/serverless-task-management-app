@@ -1,9 +1,11 @@
 const { DynamoDBClient } = require("@aws-sdk/client-dynamodb");
-const { DynamoDBDocumentClient, UpdateCommand } = require("@aws-sdk/lib-dynamodb");
+const { DynamoDBDocumentClient, GetCommand, UpdateCommand } = require("@aws-sdk/lib-dynamodb");
 
 const client = new DynamoDBClient({ region: process.env.AWS_REGION });
 const ddb = DynamoDBDocumentClient.from(client);
 const TABLE_NAME = process.env.TASKS_TABLE;
+
+const validStatuses = ["PENDING", "IN_PROGRESS", "COMPLETED"];
 
 exports.handler = async (event) => {
   try {
@@ -16,6 +18,26 @@ exports.handler = async (event) => {
     const taskId = event?.pathParameters?.taskId || body.taskId;
     if (!taskId || !body.status) {
       return { statusCode: 400, body: JSON.stringify({ message: "taskId and status are required" }) };
+    }
+    if (!validStatuses.includes(body.status)) {
+      return { statusCode: 400, body: JSON.stringify({ message: "status must be PENDING, IN_PROGRESS, or COMPLETED" }) };
+    }
+
+    const isAdmin = claims["cognito:groups"]?.includes("task_admin_group");
+    if (!isAdmin) {
+      const getResult = await ddb.send(new GetCommand({
+        TableName: TABLE_NAME,
+        Key: { PK: `TASK#${taskId}`, SK: "METADATA" },
+      }));
+      const task = getResult.Item;
+      if (!task) {
+        return { statusCode: 404, body: JSON.stringify({ message: "Task not found" }) };
+      }
+      const assignee = task.assignedTo;
+      const assignedToUser = Array.isArray(assignee) ? assignee[0] : assignee;
+      if (assignedToUser !== claims.sub) {
+        return { statusCode: 403, body: JSON.stringify({ message: "You can only update status of tasks assigned to you" }) };
+      }
     }
 
     const result = await ddb.send(new UpdateCommand({

@@ -24,27 +24,28 @@ exports.handler = async (event) => {
     return { statusCode: 403, body: JSON.stringify({ message: "Forbidden" }) };
   }
 
-  const { title, description } = JSON.parse(event.body);
+  const { title, description } = JSON.parse(event.body || "{}");
   if (!title || !description) {
-    return { statusCode: 400, body: "Title and description required" };
+    return { statusCode: 400, body: JSON.stringify({ message: "Title and description required" }) };
   }
 
   const taskId = uuidv4();
   const timestamp = new Date().toISOString();
 
+  const item = {
+    PK: { S: `TASK#${taskId}` },
+    SK: { S: "METADATA" },
+    title: { S: title },
+    description: { S: description },
+    status: { S: "PENDING" },
+    createdBy: { S: user.sub },
+    createdAt: { S: timestamp },
+    updatedAt: { S: timestamp },
+  };
+
   const params = {
     TableName: TABLE_NAME,
-    Item: {
-      PK: { S: `TASK#${taskId}` },
-      SK: { S: "METADATA" },
-      title: { S: title },
-      description: { S: description },
-      status: { S: "PENDING" },
-      createdBy: { S: user.sub },
-      assignedTo: { L: [] },
-      createdAt: { S: timestamp },
-      updatedAt: { S: timestamp },
-    },
+    Item: item,
     ConditionExpression: "attribute_not_exists(PK)"
   };
 

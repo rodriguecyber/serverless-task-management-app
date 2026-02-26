@@ -29,9 +29,19 @@ exports.handler = async (event) => {
       return { statusCode: 404, body: JSON.stringify({ message: "Task not found" }) };
     }
 
+    const task = result.Item;
+    const isAdmin = claims["cognito:groups"]?.includes("task_admin_group");
+    if (!isAdmin) {
+      const assignee = task.assignedTo;
+      const assignedToUser = Array.isArray(assignee) ? assignee[0] : assignee;
+      if (task.createdBy !== claims.sub && assignedToUser !== claims.sub) {
+        return { statusCode: 403, body: JSON.stringify({ message: "Forbidden" }) };
+      }
+    }
+
     return {
       statusCode: 200,
-      body: JSON.stringify(result.Item)
+      body: JSON.stringify(task)
     };
   } catch (error) {
     console.error(error);

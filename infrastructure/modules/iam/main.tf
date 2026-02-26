@@ -36,11 +36,19 @@ resource "aws_iam_policy" "lambda_policy" {
             "dynamodb:GetItem",
             "dynamodb:UpdateItem",
             "dynamodb:DeleteItem",
-            "dynamodb:Query"
+            "dynamodb:Query",
+            "dynamodb:Scan"
         ]
         Resource = var.dynamotable_arn
 
-        
+        },
+        # Cognito ListUsers (for list_users Lambda)
+        {
+            Effect = "Allow"
+            Action = [
+                "cognito-idp:ListUsers"
+            ]
+            Resource = var.cognito_user_pool_arn
         },
         # SNS Publish
         {
