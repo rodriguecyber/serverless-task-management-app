@@ -1,5 +1,5 @@
 const { DynamoDBClient } = require("@aws-sdk/client-dynamodb");
-const { DynamoDBDocumentClient, QueryCommand } = require("@aws-sdk/lib-dynamodb");
+const { DynamoDBDocumentClient, ScanCommand } = require("@aws-sdk/lib-dynamodb"); 
 
 const client = new DynamoDBClient({ region: process.env.AWS_REGION });
 const ddb = DynamoDBDocumentClient.from(client);
@@ -12,13 +12,14 @@ exports.handler = async (event) => {
       return { statusCode: 401, body: JSON.stringify({ message: "Unauthorized" }) };
     }
 
-    const userId = claims.sub;
-    const result = await ddb.send(new QueryCommand({
+    const userEmail = claims.email;
+    console.log("Fetching tasks for user:", claims);
+    const result = await ddb.send(new ScanCommand({
       TableName: TABLE_NAME,
-      IndexName: "GSI1",
-      KeyConditionExpression: "GSI1PK = :gsi1pk",
+      FilterExpression: "begins_with(PK, :taskPrefix) AND assignedTo = :assignedTo",
       ExpressionAttributeValues: {
-        ":gsi1pk": `USER#${userId}`
+        ":taskPrefix": "TASK#",
+        ":assignedTo": userEmail
       }
     }));
 

@@ -49,14 +49,14 @@ explicit_auth_flows = [
 }
 
 resource "aws_cognito_user_group" "task_admin_group" {
-    name = "task_admin_group"
+    name = "Admin"
     user_pool_id = aws_cognito_user_pool.task_user_pool.id
     precedence = 1
   
 }
 
 resource "aws_cognito_user_group" "task_user_group" {
-    name = "task_user_group"
+    name = "User"
     user_pool_id = aws_cognito_user_pool.task_user_pool.id
     precedence = 2
   

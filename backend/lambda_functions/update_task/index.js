@@ -35,7 +35,7 @@ exports.handler = async (event) => {
       }
       const assignee = task.assignedTo;
       const assignedToUser = Array.isArray(assignee) ? assignee[0] : assignee;
-      if (assignedToUser !== claims.sub) {
+      if (assignedToUser !== claims.email) {
         return { statusCode: 403, body: JSON.stringify({ message: "You can only update status of tasks assigned to you" }) };
       }
     }
