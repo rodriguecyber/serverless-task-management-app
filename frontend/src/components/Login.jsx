@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useAuth } from "../context/AuthContext";
 
-export default function Login() {
+export default function Login({ onRegisterClick }) {
   const { login, error } = useAuth();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -51,6 +51,12 @@ export default function Login() {
             {submitting ? "Signing in…" : "Sign in"}
           </button>
         </form>
+        <p className="auth-switch">
+          Don’t have an account?{" "}
+          <button type="button" className="link" onClick={onRegisterClick}>
+            Create account
+          </button>
+        </p>
       </section>
     </main>
   );

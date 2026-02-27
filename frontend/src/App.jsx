@@ -4,6 +4,10 @@ import { isAdmin } from "./auth";
 import { useAuth } from "./context/AuthContext";
 import { isCognitoConfigured } from "./config/amplify";
 import Login from "./components/Login";
+import Register from "./components/Register";
+import VerifyAccount from "./components/VerifyAccount";
+
+const AUTH_SCREEN = { LOGIN: "login", REGISTER: "register", VERIFY: "verify" };
 
 const initialResult = { action: "None", ok: true, payload: null, error: "" };
 const baseUrl = () => (import.meta.env.VITE_API_BASE_URL || "").trim().replace(/\/+$/, "");
@@ -235,6 +239,8 @@ function AuthenticatedApp() {
 
 export default function App() {
   const { user, loading } = useAuth();
+  const [authScreen, setAuthScreen] = useState(AUTH_SCREEN.LOGIN);
+  const [verifyUsername, setVerifyUsername] = useState("");
 
   if (!isCognitoConfigured) {
     return (
@@ -258,7 +264,31 @@ export default function App() {
   }
 
   if (!user) {
-    return <Login />;
+    return (
+      <>
+        {authScreen === AUTH_SCREEN.LOGIN && (
+          <Login
+            onRegisterClick={() => setAuthScreen(AUTH_SCREEN.REGISTER)}
+          />
+        )}
+        {authScreen === AUTH_SCREEN.REGISTER && (
+          <Register
+            onSuccess={(username) => {
+              setVerifyUsername(username);
+              setAuthScreen(AUTH_SCREEN.VERIFY);
+            }}
+            onSignInClick={() => setAuthScreen(AUTH_SCREEN.LOGIN)}
+          />
+        )}
+        {authScreen === AUTH_SCREEN.VERIFY && (
+          <VerifyAccount
+            username={verifyUsername}
+            onSuccess={() => setAuthScreen(AUTH_SCREEN.LOGIN)}
+            onSignInClick={() => setAuthScreen(AUTH_SCREEN.LOGIN)}
+          />
+        )}
+      </>
+    );
   }
 
   return <AuthenticatedApp />;
