@@ -4,17 +4,17 @@ const path = require("path");
 
 const lambdasDir = path.join(__dirname, "lambda_functions");
 const outDir = path.join(__dirname, "dist");
-const lambdaNameMap = {
-  update_tasks: "update_task",
-  delete_tasks: "delete_task",
-};
+// const lambdaNameMap = {
+//   update_tasks: "update_task",
+//   delete_tasks: "delete_task",
+// };
 
 // Make sure dist folder exists
 if (!fs.existsSync(outDir)) fs.mkdirSync(outDir);
 
 fs.readdirSync(lambdasDir).forEach((lambdaName) => {
   const lambdaPath = path.join(lambdasDir, lambdaName, "index.js");
-  const outputName = lambdaNameMap[lambdaName] || lambdaName;
+  const outputName = lambdaName;
   const outputPath = path.join(outDir, `${outputName}.zip`);
 
   esbuild.build({

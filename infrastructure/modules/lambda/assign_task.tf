@@ -27,7 +27,7 @@
 
   resource "aws_apigatewayv2_route" "assign_task_route" {
     api_id = var.api_gateway_id
-    route_key = "POST /tasks/assign"
+    route_key = "POST /tasks/assign/{taskId}"
     target = "integrations/${aws_apigatewayv2_integration.assign_task_integration.id}" 
     authorizer_id = var.authorizer_id
     authorization_type = "JWT"

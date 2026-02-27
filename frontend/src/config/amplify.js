@@ -1,6 +1,6 @@
 /**
  * AWS Amplify configuration.
- * Auth uses Cognito (User Pool); env vars can come from .env or Amplify Console.
+ * Auth uses Cognito (User Pool); env vars can come from .env / Amplify Console.
  */
 import { Amplify } from "aws-amplify";
 
