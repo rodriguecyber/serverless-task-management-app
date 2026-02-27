@@ -204,6 +204,13 @@ button.danger {
   font-weight: 600;
 }
 
+.action-success {
+  margin-top: 0.5rem;
+  font-size: 0.9rem;
+  color: #2d6a4f;
+  font-weight: 500;
+}
+
 .task-list {
   list-style: none;
   margin: 0.5rem 0 0;

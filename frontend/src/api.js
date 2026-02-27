@@ -71,9 +71,9 @@ export const api = {
     request({
       baseUrl,
       token,
-      path: "/tasks/assign",
+      path: `/tasks/assign/${taskId}`,
       method: "POST",
-      body: { taskId, assignedTo }
+      body: { assignedTo }
     }),
 
   deleteTask: ({ baseUrl, token, taskId }) =>

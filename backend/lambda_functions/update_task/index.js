@@ -15,9 +15,9 @@ exports.handler = async (event) => {
     }
 
     const body = JSON.parse(event.body || "{}");
-    const taskId = event?.pathParameters?.taskId || body.taskId;
+    const taskId = event?.pathParameters?.taskId;
     if (!taskId || !body.status) {
-      return { statusCode: 400, body: JSON.stringify({ message: "taskId and status are required" }) };
+      return { statusCode: 400, body: JSON.stringify({ message: "taskId (path) and status (body) are required" }) };
     }
     if (!validStatuses.includes(body.status)) {
       return { statusCode: 400, body: JSON.stringify({ message: "status must be PENDING, IN_PROGRESS, or COMPLETED" }) };

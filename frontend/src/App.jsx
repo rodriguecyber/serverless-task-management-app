@@ -103,12 +103,14 @@ function AuthenticatedApp() {
                 runAction("Create Task", () => api.createTask({ baseUrl: normalizedBaseUrl, token, title, description })).then(() => {
                   setTitle("");
                   setDescription("");
-                  fetchTasks();
                 })
               }
             >
               Create
             </button>
+            {result.action === "Create Task" && (
+              <p className={result.ok ? "action-success" : "error"}>{result.ok ? "Task created." : result.error}</p>
+            )}
           </article>
 
           <article className="panel">
@@ -162,12 +164,14 @@ function AuthenticatedApp() {
                 runAction("Assign Task", () => api.assignTask({ baseUrl: normalizedBaseUrl, token, taskId, assignedTo })).then(() => {
                   setTaskId("");
                   setAssignedTo("");
-                  fetchTasks();
                 })
               }
             >
               Assign
             </button>
+            {result.action === "Assign Task" && (
+              <p className={result.ok ? "action-success" : "error"}>{result.ok ? "Task assigned." : result.error}</p>
+            )}
           </article>
 
           <article className="panel">
@@ -191,10 +195,13 @@ function AuthenticatedApp() {
             </label>
             <button
               disabled={loading || !taskId}
-              onClick={() => runAction("Update Status", () => api.updateTask({ baseUrl: normalizedBaseUrl, token, taskId, status })).then(fetchTasks)}
+              onClick={() => runAction("Update Status", () => api.updateTask({ baseUrl: normalizedBaseUrl, token, taskId, status }))}
             >
               Update
             </button>
+            {result.action === "Update Status" && (
+              <p className={result.ok ? "action-success" : "error"}>{result.ok ? "Status updated." : result.error}</p>
+            )}
           </article>
 
           <article className="panel">
@@ -212,13 +219,13 @@ function AuthenticatedApp() {
             <button
               className="danger"
               disabled={loading || !taskId}
-              onClick={() => runAction("Delete Task", () => api.deleteTask({ baseUrl: normalizedBaseUrl, token, taskId })).then(() => {
-                setTaskId("");
-                fetchTasks();
-              })}
+              onClick={() => runAction("Delete Task", () => api.deleteTask({ baseUrl: normalizedBaseUrl, token, taskId })).then(() => setTaskId(""))}
             >
               Delete
             </button>
+            {result.action === "Delete Task" && (
+              <p className={result.ok ? "action-success" : "error"}>{result.ok ? "Task deleted." : result.error}</p>
+            )}
           </article>
         </section>
       ) : (
@@ -257,20 +264,17 @@ function AuthenticatedApp() {
             </label>
             <button
               disabled={loading || !taskId}
-              onClick={() => runAction("Update Status", () => api.updateTask({ baseUrl: normalizedBaseUrl, token, taskId, status })).then(fetchMyTasks)}
+              onClick={() => runAction("Update Status", () => api.updateTask({ baseUrl: normalizedBaseUrl, token, taskId, status }))}
             >
               Update
             </button>
+            {result.action === "Update Status" && (
+              <p className={result.ok ? "action-success" : "error"}>{result.ok ? "Status updated." : result.error}</p>
+            )}
           </article>
         </section>
       )}
 
-      <section className="panel result">
-        <h2>Result</h2>
-        <p>Action: <strong>{result.action}</strong></p>
-        {!result.ok && <p className="error">Error: {result.error}</p>}
-        <pre>{JSON.stringify(result.payload, null, 2) || "No response yet."}</pre>
-      </section>
     </main>
   );
 }

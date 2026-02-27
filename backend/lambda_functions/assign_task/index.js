@@ -17,11 +17,12 @@ exports.handler = async (event) => {
     }
 
     const body = JSON.parse(event.body || "{}");
-    const { taskId, assignedTo } = body;
+    const taskId = event?.pathParameters?.taskId;
+    const assignedTo = body.assignedTo;
     if (!taskId || !assignedTo) {
       return {
         statusCode: 400,
-        body: JSON.stringify({ message: "taskId and assignedTo required" })
+        body: JSON.stringify({ message: "taskId (path) and assignedTo (body) required" })
       };
     }
 
