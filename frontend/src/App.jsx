@@ -138,13 +138,24 @@ function AuthenticatedApp() {
 
           <article className="panel">
             <h2>Assign Task</h2>
-            <label>Task ID <input value={taskId} onChange={(e) => setTaskId(e.target.value)} placeholder="from list above" /></label>
-            <label>Assign to (User sub) <select value={assignedTo} onChange={(e) => setAssignedTo(e.target.value)}>
-              <option value="">Select user</option>
-              {users.map((u) => (
-                <option key={u.sub} value={u.sub}>{u.email ?? u.sub}</option>
-              ))}
-            </select></label>
+            <label>Task
+              <select value={taskId} onChange={(e) => setTaskId(e.target.value)}>
+                <option value="">Select task</option>
+                {tasks.map((t) => (
+                  <option key={taskIdFromItem(t)} value={taskIdFromItem(t)}>
+                    {t.title} — {t.status}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label>Assign to
+              <select value={assignedTo} onChange={(e) => setAssignedTo(e.target.value)}>
+                <option value="">Select user</option>
+                {users.map((u) => (
+                  <option key={u.sub} value={u.sub}>{u.email ?? u.sub}</option>
+                ))}
+              </select>
+            </label>
             <button
               disabled={loading || !taskId || !assignedTo}
               onClick={() =>
@@ -161,7 +172,16 @@ function AuthenticatedApp() {
 
           <article className="panel">
             <h2>Update Task Status</h2>
-            <label>Task ID <input value={taskId} onChange={(e) => setTaskId(e.target.value)} /></label>
+            <label>Task
+              <select value={taskId} onChange={(e) => setTaskId(e.target.value)}>
+                <option value="">Select task</option>
+                {tasks.map((t) => (
+                  <option key={taskIdFromItem(t)} value={taskIdFromItem(t)}>
+                    {t.title} — {t.status}
+                  </option>
+                ))}
+              </select>
+            </label>
             <label>Status
               <select value={status} onChange={(e) => setStatus(e.target.value)}>
                 <option value="PENDING">PENDING</option>
@@ -179,7 +199,16 @@ function AuthenticatedApp() {
 
           <article className="panel">
             <h2>Delete Task</h2>
-            <label>Task ID <input value={taskId} onChange={(e) => setTaskId(e.target.value)} /></label>
+            <label>Task
+              <select value={taskId} onChange={(e) => setTaskId(e.target.value)}>
+                <option value="">Select task</option>
+                {tasks.map((t) => (
+                  <option key={taskIdFromItem(t)} value={taskIdFromItem(t)}>
+                    {t.title} — {t.status}
+                  </option>
+                ))}
+              </select>
+            </label>
             <button
               className="danger"
               disabled={loading || !taskId}
@@ -209,7 +238,16 @@ function AuthenticatedApp() {
           </article>
           <article className="panel">
             <h2>Update Status</h2>
-            <label>Task ID <input value={taskId} onChange={(e) => setTaskId(e.target.value)} placeholder="ID from list above" /></label>
+            <label>Task
+              <select value={taskId} onChange={(e) => setTaskId(e.target.value)}>
+                <option value="">Select task</option>
+                {myTasks.map((t) => (
+                  <option key={taskIdFromItem(t)} value={taskIdFromItem(t)}>
+                    {t.title} — {t.status}
+                  </option>
+                ))}
+              </select>
+            </label>
             <label>Status
               <select value={status} onChange={(e) => setStatus(e.target.value)}>
                 <option value="PENDING">PENDING</option>
