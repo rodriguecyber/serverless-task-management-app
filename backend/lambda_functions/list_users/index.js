@@ -8,7 +8,7 @@ exports.handler = async (event) => {
     return { statusCode: 401, body: JSON.stringify({ message: "Unauthorized" }) };
   }
   const claims = event.requestContext.authorizer.jwt.claims;
-  if (!claims["cognito:groups"]?.includes("task_admin_group")) {
+  if (!claims["cognito:groups"]?.includes("Admin")) {
     return { statusCode: 403, body: JSON.stringify({ message: "Forbidden" }) };
   }
 

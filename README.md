@@ -8,6 +8,7 @@ Task management app with role-based access: **admins** create, assign, update, a
 - **Auth:** AWS Cognito User Pool with JWT authorizer; groups `task_admin_group` (admin) and `task_user_group` (user).
 - **API:** API Gateway HTTP API (v2), JWT authorizer, Lambda proxy integrations.
 - **Backend:** Node.js 20 Lambdas; DynamoDB single table with GSI for “my tasks” by assignee.
+- **Notifications:** One SNS topic (`task_definitions`) receives all task events. A single Lambda (`notify_task_events`) is subscribed to it and sends email via SES: **assignee** when a task is assigned; **admins** when a task’s status is updated.
 - **Infrastructure:** Terraform (AWS provider ~> 6.0); optional Amplify Hosting module.
 
 ## Prerequisites
@@ -20,7 +21,7 @@ Task management app with role-based access: **admins** create, assign, update, a
 
 ```
 ├── backend/                 # Lambda functions
-│   ├── lambda_functions/    # create_task, assign_task, update_task, delete_task, get_task, get_all_tasks, my_tasks, list_users, pre_signup
+│   ├── lambda_functions/    # create_task, assign_task, update_task, delete_task, get_task, get_all_tasks, my_tasks, list_users, notify_task_events, pre_signup
 │   ├── esbuild.config.js    # Bundle and zip each Lambda
 │   └── dist/                # Built .zip artifacts (gitignored)
 ├── frontend/                # React SPA
@@ -40,7 +41,9 @@ Task management app with role-based access: **admins** create, assign, update, a
 │       ├── dynamodb/        # Tasks table + GSI1 (user → tasks)
 │       ├── iam/             # Lambda role (DynamoDB, Cognito ListUsers, SNS)
 │       ├── lambda/          # All Lambdas + routes
-│       └── amplify/        
+│       └── amplify/       
+|       |__ sns
+|       
 └── README.md
 ```
 
@@ -130,4 +133,13 @@ npm run build
 
 Lambdas get `TASKS_TABLE` and (for list_users) `USER_POOL_ID` from Terraform.
 
+## Email notifications (SNS + SES)
+
+When a task is **assigned**, the assignee receives an email (address from Cognito). When a task **status** is updated, admins receive an email. Both events are published to the same SNS topic (`task_definitions`); one Lambda (`notify_task_events`) handles all notification types and sends email via SES.
+
+1. **SES:** In AWS SES (same region as the app), verify the “From” address (or domain) you want to use. In sandbox, verify recipient addresses too unless you’re out of sandbox.
+2. **Terraform variables** (e.g. in `terraform.tfvars` or `-var`):
+   - `admin_emails` – comma-separated admin emails to notify on status update (e.g. `"admin@example.com"`).
+   - `notify_from_email` – SES-verified email used as the “From” for all notification emails (e.g. `"noreply@example.com"`).
+3. After `terraform apply`, assign and status-update flows publish to the single SNS topic; `notify_task_events` sends the emails via SES. If `admin_emails` or `notify_from_email` is empty, that part of the notification is skipped (no failure).
 

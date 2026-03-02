@@ -11,7 +11,7 @@ exports.handler = async (event) => {
     if (!claims) {
       return { statusCode: 401, body: JSON.stringify({ message: "Unauthorized" }) };
     }
-    if (!claims["cognito:groups"]?.includes("task_admin_group")) {
+    if (!claims["cognito:groups"]?.includes("Admin")) {
       return { statusCode: 403, body: JSON.stringify({ message: "Forbidden" }) };
     }
 
@@ -31,7 +31,7 @@ exports.handler = async (event) => {
     console.error(error);
     return {
       statusCode: 500,
-      body: JSON.stringify({ message: "Internal Server Error" })
+      body: JSON.stringify({ message: `Internal Server Error: ${error.message}` })
     };
   }
 };

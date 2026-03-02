@@ -9,10 +9,11 @@
     timeout = 10
 
     environment {
-    variables = {
-    TASKS_TABLE=var.task_table_name
-        
-    }
+      variables = {
+        TASKS_TABLE           = var.task_table_name
+        USER_POOL_ID          = var.user_pool_id
+        TASK_NOTIFY_TOPIC_ARN = var.sns_topic_arn
+      }
     }
     }
 
@@ -34,10 +35,10 @@
 
   }
 
-   resource "aws_lambda_permission" "assign_task_permission" {
-    statement_id = "AllowAPIGatewayInvoke"
-    action = "lambda:InvokeFunction"
-    function_name = aws_lambda_function.assign_task.function_name
-    principal = "apigateway.amazonaws.com"
-    source_arn = "${var.api_gateway_execution_arn}/*/*"
-  }
+    resource "aws_lambda_permission" "assign_task_permission" {
+      statement_id = "AllowAPIGatewayInvoke"
+      action = "lambda:InvokeFunction"
+      function_name = aws_lambda_function.assign_task.function_name
+      principal = "apigateway.amazonaws.com"
+      source_arn = "${var.api_gateway_execution_arn}/*/*"
+    }

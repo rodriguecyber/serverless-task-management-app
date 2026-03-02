@@ -19,9 +19,9 @@ provider "aws" {
    source = "./modules/sns"
  }
  module "iam" {
-   source               = "./modules/iam"
-   sns_topic_arn        = module.sns.sns_topic_arn
-   dynamotable_arn      = module.dynamodb.dynamo_table_arn
+   source                = "./modules/iam"
+   sns_topic_arn         = module.sns.sns_topic_arn
+   dynamotable_arn       = module.dynamodb.dynamo_table_arn
    cognito_user_pool_arn = module.cognito.user_pool_arn
  }
 
@@ -31,14 +31,18 @@ module "cognito" {
 }
 
 module "lambda" {
-  source               = "./modules/lambda"
-  cognito_user_pool_arn = module.cognito.user_pool_arn
-  lambda_role_arn       = module.iam.lambda_role_arn
-  task_table_name      = module.dynamodb.dynamo_table_name
-  api_gateway_id       = module.api_gateway.api_id
-  authorizer_id        = module.api_gateway.authorizer_id
-  api_gateway_execution_arn = module.api_gateway.api_gateway_execution_arn
-  user_pool_id         = module.cognito.user_pool_id
+  source                     = "./modules/lambda"
+  cognito_user_pool_arn       = module.cognito.user_pool_arn
+  lambda_role_arn             = module.iam.lambda_role_arn
+  notification_lambda_role_arn = module.iam.notification_lambda_role_arn
+  task_table_name             = module.dynamodb.dynamo_table_name
+  api_gateway_id              = module.api_gateway.api_id
+  authorizer_id               = module.api_gateway.authorizer_id
+  api_gateway_execution_arn   = module.api_gateway.api_gateway_execution_arn
+  user_pool_id               = module.cognito.user_pool_id
+  sns_topic_arn              = module.sns.sns_topic_arn
+  admin_emails               = var.admin_emails
+  notify_from_email          = var.notify_from_email
 }
 
 module "api_gateway" {

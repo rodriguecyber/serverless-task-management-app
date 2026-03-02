@@ -1,7 +1,7 @@
 resource "aws_cognito_user_pool" "task_user_pool" {
   name = "task_user_pool"
 
-#   Require email verification
+# Require email verification
 auto_verified_attributes = ["email"]
 
 # Email
@@ -23,6 +23,7 @@ password_policy {
   require_symbols = true
 
 }
+
 lambda_config {
   pre_sign_up = var.pre_signup_lambda_arn
 }

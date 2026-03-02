@@ -1,9 +1,13 @@
 const { DynamoDBClient } = require("@aws-sdk/client-dynamodb");
 const { DynamoDBDocumentClient, GetCommand, UpdateCommand } = require("@aws-sdk/lib-dynamodb");
+const { SNSClient, PublishCommand } = require("@aws-sdk/client-sns");
 
 const client = new DynamoDBClient({ region: process.env.AWS_REGION });
 const ddb = DynamoDBDocumentClient.from(client);
+const sns = new SNSClient({ region: process.env.AWS_REGION });
 const TABLE_NAME = process.env.TASKS_TABLE;
+const TASK_NOTIFY_TOPIC_ARN = process.env.TASK_NOTIFY_TOPIC_ARN;
+const ADMIN_EMAILS = process.env.ADMIN_EMAILS ? process.env.ADMIN_EMAILS.split(",").map((e) => e.trim()).filter(Boolean) : [];
 
 const validStatuses = ["PENDING", "IN_PROGRESS", "COMPLETED"];
 
@@ -35,7 +39,7 @@ exports.handler = async (event) => {
       }
       const assignee = task.assignedTo;
       const assignedToUser = Array.isArray(assignee) ? assignee[0] : assignee;
-      if (assignedToUser !== claims.email) {
+      if (assignedToUser !== claims.sub) {
         return { statusCode: 403, body: JSON.stringify({ message: "You can only update status of tasks assigned to you" }) };
       }
     }
@@ -56,6 +60,24 @@ exports.handler = async (event) => {
       },
       ReturnValues: "ALL_NEW"
     }));
+
+    const task = result.Attributes || {};
+    if (TASK_NOTIFY_TOPIC_ARN && ADMIN_EMAILS.length > 0) {
+      try {
+        await sns.send(new PublishCommand({
+          TopicArn: TASK_NOTIFY_TOPIC_ARN,
+          Message: JSON.stringify({
+            type: "task_status_updated",
+            adminEmails: ADMIN_EMAILS,
+            taskTitle: task.title || "Task",
+            taskId,
+            newStatus: body.status
+          })
+        }));
+      } catch (notifyErr) {
+        console.warn("Failed to send status-updated notification:", notifyErr);
+      }
+    }
 
     return {
       statusCode: 200,

@@ -20,7 +20,7 @@ exports.handler = async (event) => {
   }
   const user = event.requestContext.authorizer.jwt.claims;
 
-  if (!user["cognito:groups"]?.includes("task_admin_group")) {
+  if (!user["cognito:groups"]?.includes("Admin")) {
     return { statusCode: 403, body: JSON.stringify({ message: "Forbidden" }) };
   }
 

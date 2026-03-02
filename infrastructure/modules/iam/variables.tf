@@ -10,6 +10,6 @@ variable "sns_topic_arn" {
 }
 
 variable "cognito_user_pool_arn" {
-    description = "The ARN of the Cognito User Pool (for ListUsers)"
+    description = "The ARN of the Cognito User Pool (for ListUsers, AdminGetUser)"
     type        = string
 }

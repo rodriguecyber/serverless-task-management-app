@@ -9,10 +9,11 @@
     timeout = 10
 
     environment {
-    variables = {
-    TASKS_TABLE=var.task_table_name
-        
-    }
+      variables = {
+        TASKS_TABLE           = var.task_table_name
+        TASK_NOTIFY_TOPIC_ARN = var.sns_topic_arn
+        ADMIN_EMAILS          = var.admin_emails
+      }
     }
     }
 

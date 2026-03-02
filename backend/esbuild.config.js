@@ -14,6 +14,7 @@ if (!fs.existsSync(outDir)) fs.mkdirSync(outDir);
 
 fs.readdirSync(lambdasDir).forEach((lambdaName) => {
   const lambdaPath = path.join(lambdasDir, lambdaName, "index.js");
+  if (!fs.existsSync(lambdaPath)) return;
   const outputName = lambdaName;
   const outputPath = path.join(outDir, `${outputName}.zip`);
 
