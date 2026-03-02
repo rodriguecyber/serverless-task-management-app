@@ -62,3 +62,59 @@ resource "aws_cognito_user_group" "task_user_group" {
     precedence = 2
   
 }
+
+# Seed admin user via AWS CLI (Cognito has no Terraform resource for users)
+resource "null_resource" "seed_admin_user" {
+  count = length(var.seed_admin_username) > 0 && length(var.seed_admin_temp_password) > 0 ? 1 : 0
+
+  triggers = {
+    user_pool_id = aws_cognito_user_pool.task_user_pool.id
+    username     = var.seed_admin_username
+  }
+
+  provisioner "local-exec" {
+    when = create
+    command = join(" ", [
+      "aws cognito-idp admin-create-user",
+      "--user-pool-id", aws_cognito_user_pool.task_user_pool.id,
+      "--username", var.seed_admin_username,
+      "--user-attributes", "Name=email,Value=${var.seed_admin_username} Name=email_verified,Value=true",
+      "--temporary-password", var.seed_admin_temp_password,
+      "--message-action SUPPRESS"
+    ])
+    environment = {
+      AWS_DEFAULT_REGION = data.aws_region.current.name
+    }
+  }
+
+  provisioner "local-exec" {
+    when = create
+    command = join(" ", [
+      "aws cognito-idp admin-set-user-password",
+      "--user-pool-id", aws_cognito_user_pool.task_user_pool.id,
+      "--username", var.seed_admin_username,
+      "--password", var.seed_admin_temp_password,
+      "--permanent"
+    ])
+    environment = {
+      AWS_DEFAULT_REGION = data.aws_region.current.name
+    }
+  }
+
+  provisioner "local-exec" {
+    when = create
+    command = join(" ", [
+      "aws cognito-idp admin-add-user-to-group",
+      "--user-pool-id", aws_cognito_user_pool.task_user_pool.id,
+      "--username", var.seed_admin_username,
+      "--group-name", aws_cognito_user_group.task_admin_group.name
+    ])
+    environment = {
+      AWS_DEFAULT_REGION = data.aws_region.current.name
+    }
+  }
+
+  depends_on = [aws_cognito_user_group.task_admin_group]
+}
+
+data "aws_region" "current" {}

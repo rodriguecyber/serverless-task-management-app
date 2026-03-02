@@ -119,8 +119,24 @@ npm run build
 
 ## Users and roles
 
-- **Cognito groups:** `task_admin_group` (admin), `task_user_group` (user). Add users to groups in Cognito (Console or CLI).
+- **Cognito groups:** `Admin` (admin), `User` (user). Add users to groups in Cognito (Console or CLI), or seed an admin with Terraform (see below).
 - **Flow:** Register (email + password) → verify with code from email → sign in. UI switches by group: admins get create/assign/delete/list users; users get “My tasks” and update status.
+
+### Seed admin user (Terraform)
+
+To create one admin user and add them to the **Admin** group at apply time, set:
+
+- `seed_admin_username` – e.g. `admin@example.com` (used as username and email).
+- `seed_admin_temp_password` – temporary password meeting the pool policy (min 8 chars, upper, lower, number, symbol). Prefer setting via `-var` so it isn’t stored in state or tfvars.
+
+Example (one-time):
+
+```bash
+cd infrastructure
+terraform apply -var="seed_admin_username=admin@example.com" -var="seed_admin_temp_password=TempPass1!"
+```
+
+Leave both variables empty (default) to skip seeding. The seed runs only when the null_resource is created; if the user already exists, remove or change the seed vars and re-apply, or taint the resource to re-run.
 
 ## Environment variables
 

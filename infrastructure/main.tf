@@ -1,8 +1,12 @@
 terraform {
   required_providers {
-    aws= {
-        source = "hashicorp/aws"
-        version = "~> 6.0"
+    aws = {
+      source  = "hashicorp/aws"
+      version = "~> 6.0"
+    }
+    null = {
+      source  = "hashicorp/null"
+      version = "~> 3.0"
     }
   }
   required_version = ">= 1.14.2"
@@ -26,8 +30,10 @@ provider "aws" {
  }
 
 module "cognito" {
-  source = "./modules/cognito"
-  pre_signup_lambda_arn = module.lambda.pre_signup_lambda_arn
+  source                 = "./modules/cognito"
+  pre_signup_lambda_arn  = module.lambda.pre_signup_lambda_arn
+  seed_admin_username    = var.seed_admin_username
+  seed_admin_temp_password = var.seed_admin_temp_password
 }
 
 module "lambda" {
