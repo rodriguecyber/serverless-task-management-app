@@ -17,5 +17,5 @@ export function decodeToken(token) {
 export function isAdmin(token) {
   const payload = decodeToken(token);
   const groups = payload?.["cognito:groups"];
-  return Array.isArray(groups) && groups.includes("task_admin_group");
+  return Array.isArray(groups) && groups.includes("Admin");
 }
