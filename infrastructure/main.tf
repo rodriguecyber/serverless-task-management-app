@@ -22,6 +22,12 @@ provider "aws" {
  module "sns" {
    source = "./modules/sns"
  }
+
+ module "ses" {
+   source        = "./modules/ses"
+   sender_email  = var.notify_from_email
+ }
+
  module "iam" {
    source                = "./modules/iam"
    sns_topic_arn         = module.sns.sns_topic_arn

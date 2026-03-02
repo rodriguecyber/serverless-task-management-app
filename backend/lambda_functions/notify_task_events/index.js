@@ -1,7 +1,7 @@
 const { SESClient, SendEmailCommand } = require("@aws-sdk/client-ses");
 
 const ses = new SESClient({ region: process.env.AWS_REGION });
-const FROM_EMAIL = process.env.NOTIFY_FROM_EMAIL || "noreply@example.com";
+const FROM_EMAIL = process.env.NOTIFY_FROM_EMAIL || "rodrirwigara@gmail.com";
 
 async function sendEmail(toAddresses, subject, bodyText) {
   if (!toAddresses.length) return;

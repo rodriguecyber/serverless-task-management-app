@@ -32,3 +32,6 @@ variable "seed_admin_temp_password" {
   default     = ""
   sensitive   = true
 }
+
+
+ 
