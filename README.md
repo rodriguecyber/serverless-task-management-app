@@ -157,5 +157,6 @@ When a task is **assigned**, the assignee receives an email (address from Cognit
 2. **Terraform variables** (e.g. in `terraform.tfvars` or `-var`):
    - `admin_emails` – comma-separated admin emails to notify on status update (e.g. `"admin@example.com"`).
    - `notify_from_email` – SES-verified email used as the “From” for all notification emails (e.g. `"noreply@example.com"`).
-3. After `terraform apply`, assign and status-update flows publish to the single SNS topic; `notify_task_events` sends the emails via SES. If `admin_emails` or `notify_from_email` is empty, that part of the notification is skipped (no failure).
+3. **Sandbox:** Set `ses_verified_recipient_emails` to a list of emails that may receive (admins + assignees). Terraform creates an SES identity for each; each gets a verification email—they must click the link. Only these addresses can receive until you request production access.
+4. After `terraform apply` and verifying all links, assign and status-update flows send emails via SES. If a recipient isn’t verified (sandbox), the Lambda logs a warning and continues without failing.
 

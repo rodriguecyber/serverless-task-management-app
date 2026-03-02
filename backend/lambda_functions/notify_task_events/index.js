@@ -1,18 +1,27 @@
 const { SESClient, SendEmailCommand } = require("@aws-sdk/client-ses");
 
 const ses = new SESClient({ region: process.env.AWS_REGION });
-const FROM_EMAIL = process.env.NOTIFY_FROM_EMAIL || "rodrirwigara@gmail.com";
+const FROM_EMAIL = process.env.NOTIFY_FROM_EMAIL || "noreply@example.com";
 
 async function sendEmail(toAddresses, subject, bodyText) {
   if (!toAddresses.length) return;
-  await ses.send(new SendEmailCommand({
-    Source: FROM_EMAIL,
-    Destination: { ToAddresses: toAddresses },
-    Message: {
-      Subject: { Data: subject },
-      Body: { Text: { Data: bodyText } }
+  try {
+    await ses.send(new SendEmailCommand({
+      Source: FROM_EMAIL,
+      Destination: { ToAddresses: toAddresses },
+      Message: {
+        Subject: { Data: subject },
+        Body: { Text: { Data: bodyText } }
+      }
+    }));
+  } catch (err) {
+    const isMessageRejected = err.name === "MessageRejected" || err.Code === "MessageRejected";
+    if (isMessageRejected) {
+      console.warn("SES MessageRejected (recipient or sender not verified in SES, or account in sandbox):", toAddresses, err.message);
+      return;
     }
-  }));
+    throw err;
+  }
 }
 
 exports.handler = async (event) => {

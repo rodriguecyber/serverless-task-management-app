@@ -27,7 +27,7 @@ exports.handler = async (event) => {
       return { statusCode: 400, body: JSON.stringify({ message: "status must be PENDING, IN_PROGRESS, or COMPLETED" }) };
     }
 
-    const isAdmin = claims["cognito:groups"]?.includes("task_admin_group");
+    const isAdmin = claims["cognito:groups"]?.includes("Admin");
     if (!isAdmin) {
       const getResult = await ddb.send(new GetCommand({
         TableName: TABLE_NAME,
@@ -39,7 +39,7 @@ exports.handler = async (event) => {
       }
       const assignee = task.assignedTo;
       const assignedToUser = Array.isArray(assignee) ? assignee[0] : assignee;
-      if (assignedToUser !== claims.sub) {
+      if (assignedToUser !== claims.email) {
         return { statusCode: 403, body: JSON.stringify({ message: "You can only update status of tasks assigned to you" }) };
       }
     }

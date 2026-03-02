@@ -24,8 +24,9 @@ provider "aws" {
  }
 
  module "ses" {
-   source        = "./modules/ses"
-   sender_email  = var.notify_from_email
+   source          = "./modules/ses"
+   sender_email    = var.notify_from_email
+   recipient_emails = var.ses_verified_recipient_emails
  }
 
  module "iam" {

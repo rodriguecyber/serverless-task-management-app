@@ -15,9 +15,15 @@ variable "admin_emails" {
 }
 
 variable "notify_from_email" {
-  description = "SES-verified email address used as 'From' for notification emails (must be verified in SES)"
+  description = "SES sender (From) email. Terraform creates this identity; verify via the link SES sends."
   type        = string
   default     = ""
+}
+
+variable "ses_verified_recipient_emails" {
+  description = "List of emails that may receive notifications (SES sandbox: each must be verified). Include admins and any assignees. Each gets a verification email on apply."
+  type        = list(string)
+  default     = ["rodrigue.rwigara@amalitech.com","rodrigue.rwigara@amalitechtraining.org"]
 }
 
 variable "seed_admin_username" {
