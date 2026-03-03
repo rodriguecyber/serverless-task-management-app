@@ -115,7 +115,7 @@ Build for production:
 npm run build
 ```
 
- used the Terraform Amplify module to connect the repo and deploy with the same env vars in Amplify Console.
+ used the Terraform Amplify module to connect  the repo and deploy with the same env vars in Amplify Console.
 
 ## Users and roles
 
